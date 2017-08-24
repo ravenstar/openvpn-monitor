@@ -1,0 +1,75 @@
+#! /bin/bash
+### BEGIN INIT INFO
+# Provides:          openvpn-monitor
+# Required-Start:
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: openvpn-monitor gunicorn server
+# Description:       Starts the openvpn-monitor gunicorn server.
+#
+### END INIT INFO
+#
+# Author:       ravenstar - https://github.com/ravenstar
+#
+
+APPNAME=openvpn-monitor
+USER=ec2-user
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+WORKDIR=/opt/virtualenvs/openvpn-monitor
+ACTIVATE=${WORKDIR}/venv/bin/activate
+APPMODULE=openvpn-monitor
+DAEMON=gunicorn
+BIND=0.0.0.0:4200
+PIDFILE=/var/run/gunicorn.pid
+LOGFILE=/var/log/$DAEMON.log
+WORKERS=2
+
+
+. /etc/rc.d/init.d/functions
+
+
+if [ -e "/etc/default/$APPNAME" ]
+then
+    . /etc/default/$APPNAME
+fi
+
+cd "${WORKDIR}" || exit 1;
+
+case "$1" in
+  start)
+        echo -n $"Starting:" "$APPNAME"
+        source $ACTIVATE
+        $DAEMON --daemon --bind=$BIND --pid=$PIDFILE --workers=$WORKERS --user=$USER --log-file=$LOGFILE $APPMODULE
+
+        if [ $? -ne 0 ]; then
+            failure; echo
+        else
+            success; echo
+        fi
+    ;;
+  stop)
+       	echo -n $"Stopping:" "$APPNAME"
+        killproc -p $PIDFILE $DAEMON
+
+        if [ $? -ne 0 ]; then
+            failure; echo
+        else
+            success; echo
+        fi
+    ;;
+  force-reload|restart)
+    $0 stop
+    sleep 1s
+    $0 start
+    ;;
+  status)
+    status -p $PIDFILE $DAEMON && exit 0 || exit $?
+    ;;
+  *)
+    echo "Usage: /etc/init.d/$APPNAME {start|stop|restart|force-reload|status}"
+    exit 1
+    ;;
+esac
+
+exit 0

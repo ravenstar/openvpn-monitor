@@ -1,3 +1,7 @@
+# This is a fork!
+## Full credit goes to the original authors, please refer to the original source at https://github.com/furlongm/openvpn-monitor
+
+
 # OpenVPN-Monitor
 
 
@@ -20,47 +24,18 @@ https://github.com/furlongm/openvpn-monitor
 
 ## Installation with virtualenv + pip + gunicorn
 
-N.B libgeoip-dev should also be installed using yum/apt-get
+Installation on Amazon Linux is a pain, you will have to manually resolve some dependencies.
 
 ```shell
 mkdir /srv/openvpn-monitor
 cd /srv/openvpn-monitor
-virtualenv .
-. bin/activate
+virtualenv venv
+. venv/bin/activate
 pip install openvpn-monitor gunicorn
+pip install -r requirements.txt
 gunicorn openvpn-monitor -b 0.0.0.0:80
 ```
 
-## Installation with Docker
-
-```shell
-docker run -p 80:80 ruimarinho/openvpn-monitor
-```
-
-Read the [docker installation instructions](https://github.com/ruimarinho/docker-openvpn-monitor#usage) for details on how to generate a dynamic configuration using only environment variables.
-
-
-## Standard Installation
-
-### Install dependencies and configure apache
-
-#### Debian / Ubuntu
-
-```shell
-apt-get -y install python-geoip python-ipaddr python-humanize python-bottle python-semantic-version apache2 libapache2-mod-wsgi git wget
-echo "WSGIScriptAlias /openvpn-monitor /var/www/html/openvpn-monitor/openvpn-monitor.py" > /etc/apache2/conf-available/openvpn-monitor.conf
-a2enconf openvpn-monitor
-systemctl restart apache2
-```
-
-#### CentOS
-
-```shell
-yum install -y epel-release
-yum install -y python-GeoIP python-ipaddr python-humanize python-bottle python-semantic_version httpd mod_wsgi git wget
-echo "WSGIScriptAlias /openvpn-monitor /var/www/html/openvpn-monitor/openvpn-monitor.py" > /etc/httpd/conf.d/openvpn-monitor.conf
-systemctl restart httpd
-```
 
 ### Checkout OpenVPN-Monitor
 
@@ -100,7 +75,7 @@ should give some indication of how to set site name, add a logo, etc. You can
 also set a default location (latitude and longitude) for the embedded maps.
 If not set, the default location is Melbourne, Australia.
 
-Edit `/var/www/html/openvpn-monitor/openvpn-monitor.conf` to match your site.
+Edit `/opt/virtualenvs/openvpn-monitor/venv/etc/openvpn-monitor.conf` to match your site.
 
 You should now be able to navigate to `http://myipaddress/openvpn-monitor`
 
